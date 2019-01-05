@@ -23,16 +23,27 @@ defmodule EvemarketScanner do
 
 		response = HTTPoison.post!(url, body, headers).body |> Jason.decode!
 
-		# changeset = Character.changeset(char, %{access_token: response.access_token})
+		changeset = Character.changeset(char, %{
+			access_token: response["access_token"],
+			expires_at: add_seconds_to_utc_now(response["expires_in"])
+		})
+
+		Repo.update! changeset
 	end
 
-  def wallet do
+	def add_seconds_to_utc_now(seconds) do
+		DateTime.utc_now 
+			|> DateTime.to_unix()
+			|> Kernel.+(seconds)
+	end
 
-		char = Repo.all(Character) |> Enum.at(0)
+  def wallet(character_name) do
+		char = Repo.get_by!(Character, character_name: character_name)
 		access_token = char.access_token
+		character_id = char.character_id
 
-		url = "https://esi.evetech.net/latest/characters/2112161508/wallet/"
+		url = "https://esi.evetech.net/latest/characters/#{character_id}/wallet/"
 		headers = [{"Authorization", "Bearer " <> access_token}]
-		HTTPoison.get url, headers
+		HTTPoison.get!(url, headers).body
 	end
 end
