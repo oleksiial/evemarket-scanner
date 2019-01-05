@@ -6,9 +6,12 @@ config :evemarket_scanner, EvemarketScanner.Repo,
   database: "evemarket_scanner_repo",
   username: "postgres",
   password: "postgres",
-  hostname: "localhost"
+  hostname: "localhost",
+  migration_timestamps: [type: :utc_datetime]
 
 config :evemarket_scanner, ecto_repos: [EvemarketScanner.Repo]
+
+config :joken, default_signer: "BDaeQQMyl4FlC2jgWGGqHYfQqGLL8Vf+qXcFfkPfUr5P2CjY/oXTjQEz4jt8ZtBV"
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this

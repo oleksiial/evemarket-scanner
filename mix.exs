@@ -25,7 +25,8 @@ defmodule EvemarketScanner.MixProject do
       {:httpoison, "~> 1.5"},
       {:jason, "~> 1.1"},
       {:postgrex, "~> 0.14.1"},
-      {:ecto_sql, "~> 3.0"}
+      {:ecto_sql, "~> 3.0"},
+      {:joken, "~> 2.0"}
     ]
   end
 end
