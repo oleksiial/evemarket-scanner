@@ -23,7 +23,6 @@ erl_crash.dump
 evemarket_scanner-*.tar
 
 # Ignore app keys
-.env
-
+config.secrets.exs
 
 *.csv

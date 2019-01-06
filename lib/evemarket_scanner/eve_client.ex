@@ -16,14 +16,12 @@ defmodule EvemarketScanner.EveClient do
 	end
 
 	defp refresh_token(character) do
+		eve_client_id = Application.get_env(:evemarket_scanner, :eve_client_id)
+		eve_client_secret = Application.get_env(:evemarket_scanner, :eve_client_secret)
+		base64 = Base.encode64("#{eve_client_id}:#{eve_client_secret}")
 		headers = [
 			{ "Content-Type", "application/json" },
-			{
-        "Authorization",
-        "Basic #{
-          Base.encode64("#{System.get_env("EVE_CLIENT_ID")}:#{System.get_env("EVE_CLIENT_SECRET")}")
-        }"
-      }
+			{ "Authorization", "Basic " <> base64 }
 		]
 		body = %{grant_type: "refresh_token", refresh_token: character.refresh_token} |> Jason.encode!
 		response = HTTPoison.post!(Urls.token, body, headers).body |> Jason.decode!
