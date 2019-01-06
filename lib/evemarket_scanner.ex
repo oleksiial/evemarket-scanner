@@ -24,11 +24,19 @@ defmodule EvemarketScanner do
 	def type_orders(region_id, type_id, order_type \\ "all", page \\ 1) do
 		HTTPoison.get!(Urls.type_orders(region_id, type_id, order_type, page)).body |> Jason.decode!
 	end
+
 	def type_orders_margin(region_id, type_id) do
-		last_sell_order = hd type_orders(region_id, type_id, "sell") |> Enum.take(-1)
-		last_buy_order = hd type_orders(region_id, type_id, "buy") |> Enum.take(-1)
-		diff = last_sell_order["price"] * (1-0.025-0.010)  - last_buy_order["price"] * (1+0.003)
-		diff / (last_buy_order["price"] * (1+0.003)) * 100
+		sell_orders = type_orders(region_id, type_id, "sell") |> Enum.take(-1)
+		buy_orders = type_orders(region_id, type_id, "buy") |> Enum.take(-1)
+		if sell_orders == [] or buy_orders == [] do
+			-100
+		else
+			last_sell_order = hd sell_orders
+			last_buy_order = hd buy_orders
+
+			diff = last_sell_order["price"] * (1-0.025-0.010) - last_buy_order["price"] * (1+0.003)
+			diff / (last_buy_order["price"] * (1+0.003)) * 100
+		end
 	end
 
 	def type_info(name), do: [Repo.get_by!(Type, name: name).type_id] |> types_info()

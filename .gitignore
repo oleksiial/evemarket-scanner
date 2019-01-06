@@ -24,3 +24,6 @@ evemarket_scanner-*.tar
 
 # Ignore app keys
 .env
+
+
+*.csv

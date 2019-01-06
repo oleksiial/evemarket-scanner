@@ -11,6 +11,6 @@ defmodule EvemarketScanner.Type do
   def changeset(character, params \\ %{}) do
     character
     |> Ecto.Changeset.cast(params, [:type_id, :name, :market_group_id, :group_id])
-    |> Ecto.Changeset.validate_required([:type_id, :name, :market_group_id, :group_id])
+    |> Ecto.Changeset.validate_required([:type_id, :name, :group_id])
   end
 end
