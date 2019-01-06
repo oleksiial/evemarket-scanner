@@ -7,7 +7,7 @@ defmodule EvemarketScanner.EveClient do
 		HTTPoison.get!(url, headers).body |> Jason.decode!
 	end
 
-	def check_access_token(character) do
+	defp check_access_token(character) do
 		if character.expires_at <= (DateTime.utc_now |> DateTime.to_unix) do
 			refresh_token(character)
 		else
@@ -15,7 +15,7 @@ defmodule EvemarketScanner.EveClient do
 		end
 	end
 
-	def refresh_token(character) do
+	defp refresh_token(character) do
 		headers = [
 			{ "Content-Type", "application/json" },
 			{
@@ -36,7 +36,7 @@ defmodule EvemarketScanner.EveClient do
 		Repo.update! changeset
 	end
 
-	def add_seconds_to_utc_now(seconds) do
+	defp add_seconds_to_utc_now(seconds) do
 		DateTime.utc_now 
 			|> DateTime.to_unix()
 			|> Kernel.+(seconds)
