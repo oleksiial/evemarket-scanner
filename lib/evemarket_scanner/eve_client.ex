@@ -2,7 +2,7 @@ defmodule EvemarketScanner.EveClient do
 	alias EvemarketScanner.{Repo, Character, Urls}
 
 	def get!(character, url) do
-		check_access_token(character) # check access_token and update if need
+		character = check_access_token(character) # check access_token and update if need
 		headers = [{"Authorization", "Bearer " <> character.access_token}]
 		HTTPoison.get!(url, headers).body |> Jason.decode!
 	end
@@ -10,6 +10,8 @@ defmodule EvemarketScanner.EveClient do
 	def check_access_token(character) do
 		if character.expires_at <= (DateTime.utc_now |> DateTime.to_unix) do
 			refresh_token(character)
+		else
+			character
 		end
 	end
 

@@ -11,6 +11,11 @@ defmodule EvemarketScanner do
 		EveClient.get!(character, Urls.orders(character.character_id))
 	end
 
+	def transactions(character_name) do
+		character = Repo.get_by!(Character, character_name: character_name)
+		EveClient.get!(character, Urls.transactions(character.character_id))
+	end
+
 	def order_history(character_name, page \\ 1) do
 		character = Repo.get_by!(Character, character_name: character_name)
 		EveClient.get!(character, Urls.order_history(character.character_id, page))	

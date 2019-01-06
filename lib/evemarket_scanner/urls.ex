@@ -3,6 +3,9 @@ defmodule EvemarketScanner.Urls do
 
 	def wallet(char_id), do: "https://esi.evetech.net/latest/characters/#{char_id}/wallet/"
 	def orders(char_id), do: "https://esi.evetech.net/latest/characters/#{char_id}/orders/"
+	def transactions(char_id) do
+		"https://esi.evetech.net/latest/characters/#{char_id}/wallet/transactions/"
+	end
 
 	def order_history(char_id, page \\ 1) do
 		"https://esi.evetech.net/latest/characters/#{char_id}/orders/history/?page=#{page}"
