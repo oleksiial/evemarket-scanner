@@ -1,23 +1,24 @@
 defmodule EvemarketScanner.EveClient do
 	alias EvemarketScanner.{Repo, Character, Urls}
 
-	def get!(character, url) do
+	def get_auth!(character, url) do
 		character = check_access_token(character) # check access_token and update if need
 		headers = [{"Authorization", "Bearer " <> character.access_token}]
-		HTTPoison.get!(url, headers).body |> Jason.decode!(keys: :atoms)
+		get!(url, headers)
 	end
 
-	def get!(url) do
-		{:ok, response_body} = get(url)
+	def get!(url, headers \\ []) do
+		{:ok, response_body} = get(url, headers)
 		response_body
 	end
-	def get(url) do
-		case HTTPoison.get(url) do
-			{:ok, %HTTPoison.Response{status_code: 200, body: body}} -> 
-				{:ok, Jason.decode!(body, keys: :atoms)}
+	def get(url, headers \\ []) do
+		{status, response} = case HTTPoison.get(url, headers) do
+			{:ok, %HTTPoison.Response{status_code: 200} = response} -> {:ok, response}
 			{:ok ,%HTTPoison.Response{} = response} -> {:eve_error, response}
 			default -> default
 		end
+		IO.inspect response
+		{status, Jason.decode!(response.body, keys: :atoms)}
 	end
 
 	defp check_access_token(character) do

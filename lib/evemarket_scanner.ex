@@ -3,12 +3,12 @@ defmodule EvemarketScanner do
 
   def wallet(character_name \\ "Alex Prog") do
 		character = Repo.get_by!(Character, character_name: character_name)
-		EveClient.get!(character, Urls.wallet(character.character_id))
+		EveClient.get_auth!(character, Urls.wallet(character.character_id))
 	end
 
 	def orders(character_name \\ "Alex Prog") do
 		character = Repo.get_by!(Character, character_name: character_name)
-		EveClient.get!(character, Urls.orders(character.character_id))
+		EveClient.get_auth!(character, Urls.orders(character.character_id))
 	end
 
 	def process_transactions(transactions) do
@@ -30,7 +30,7 @@ defmodule EvemarketScanner do
 		character = Repo.get_by!(Character, character_name: character_name)
 		start_date = start_date |> EvemarketScanner.Helpers.date_to_datetime
 		end_date = end_date |> EvemarketScanner.Helpers.date_to_datetime
-		EveClient.get!(character, Urls.transactions(character.character_id))
+		EveClient.get_auth!(character, Urls.transactions(character.character_id))
 		|> Enum.filter(fn t ->
 				t_date = EvemarketScanner.Helpers.cast_date(t.date)
 				Timex.diff(start_date, t_date) < 0 and Timex.diff(end_date, t_date) > 0
@@ -40,7 +40,7 @@ defmodule EvemarketScanner do
 
 	def order_history(character_name \\ "Alex Prog", page \\ 1) do
 		character = Repo.get_by!(Character, character_name: character_name)
-		EveClient.get!(character, Urls.order_history(character.character_id, page))	
+		EveClient.get_auth!(character, Urls.order_history(character.character_id, page))	
 	end
 
 	def sell_orders_to_update(character_name \\ "Alex Prog") do
@@ -92,8 +92,10 @@ defmodule EvemarketScanner do
 	end
 
 	def type_orders_margin(region_id, type_id) do
-		sell_orders = type_orders(region_id, type_id, "sell") |> Enum.take(-1)
-		buy_orders = type_orders(region_id, type_id, "buy") |> Enum.take(-1)
+		sell_orders = type_orders(region_id, type_id, "sell")
+		|> Enum.sort(&(&1.price < &2.price))
+		buy_orders = type_orders(region_id, type_id, "buy")
+		|> Enum.sort(&(&1.price > &2.price))
 		if sell_orders == [] or buy_orders == [] do
 			-100.0
 		else
