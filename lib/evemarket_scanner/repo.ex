@@ -3,12 +3,9 @@ defmodule EvemarketScanner.Repo do
     otp_app: :evemarket_scanner,
     adapter: Ecto.Adapters.Postgres
 
-  def insert_types(type_ids) do
-    types_info = EvemarketScanner.types_info(type_ids)
-    Enum.each(types_info, fn type ->
-      type_l = type |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-      changeset = struct EvemarketScanner.Type, type_l
-      EvemarketScanner.Repo.insert! changeset
-    end)
+  def create_type(%{} = attrs) do
+    attrs = attrs |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+    changeset = struct EvemarketScanner.Type, attrs
+    EvemarketScanner.Repo.insert! changeset
   end
 end

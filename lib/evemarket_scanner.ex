@@ -38,7 +38,7 @@ defmodule EvemarketScanner do
 				end)
 			|> Enum.filter(&(&1) != nil)
 			|> types_info()
-			|> Enum.map(&(&1["name"]))
+			|> Enum.map(&(&1.name))
 	end
 
 	def buy_orders_to_update(character_name \\ "Alex Prog") do
@@ -58,7 +58,7 @@ defmodule EvemarketScanner do
 				end)
 			|> Enum.filter(&(&1) != nil)
 			|> types_info()
-			|> Enum.map(&(&1["name"]))
+			|> Enum.map(&(&1.name))
 	end
 
 	def type_orders(region_id, type_id, order_type \\ "all", page \\ 1) do
@@ -79,10 +79,17 @@ defmodule EvemarketScanner do
 		end
 	end
 
-	def type_info(name), do: [Repo.get_by!(Type, name: name).type_id] |> types_info()
-	def types_info(type_ids) do
-		Enum.reduce type_ids, [], fn x, acc -> acc ++ [(HTTPoison.get!(Urls.type_info(x)).body |> Jason.decode!)] end
+	def type_info(name) when is_binary(name), do: type_info(Repo.get_by(Type, name: name), nil)
+	def type_info(id) when is_number(id), do: type_info(Repo.get(Type, id), id)	
+	defp type_info(nil, nil), do: :not_found
+	defp type_info(nil, id) do
+		(id |> Urls.type_info() |> HTTPoison.get!()).body
+			|> Jason.decode!
+			|> Repo.create_type 
 	end
+	defp type_info(type, _id), do: type
+
+	def types_info(type_ids), do: type_ids |> Enum.map(&type_info(&1))
 
 	def groups_info(group_ids) do
 		Enum.reduce(group_ids, [], fn x, acc -> acc ++ [(HTTPoison.get!(Urls.group_info(x)).body |> Jason.decode!)] end)
