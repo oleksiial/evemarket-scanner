@@ -21,6 +21,46 @@ defmodule EvemarketScanner do
 		EveClient.get!(character, Urls.order_history(character.character_id, page))	
 	end
 
+	def sell_orders_to_update(character_name \\ "Alex Prog") do
+		orders = character_name |> orders() |> Enum.filter(&(!&1["is_buy_order"]))
+		orders 
+			|> Enum.map(&(&1["type_id"]))
+			|> Enum.map(fn type ->
+					my_type_orders = orders |> Enum.filter(&(&1["type_id"] == type))
+					my_type_orders_count = my_type_orders |> Enum.count()
+					type_on_top? = type_orders(10000002, type, "sell")
+						|> Enum.sort(&(&1["price"] < &2["price"]))
+						|> Enum.take(my_type_orders_count)
+						|> Enum.all?(fn order ->
+							Enum.find_value(my_type_orders, &(&1["order_id"] == order["order_id"]))
+						end)
+					if !type_on_top?, do: type, else: nil
+				end)
+			|> Enum.filter(&(&1) != nil)
+			|> types_info()
+			|> Enum.map(&(&1["name"]))
+	end
+
+	def buy_orders_to_update(character_name \\ "Alex Prog") do
+		orders = character_name |> orders() |> Enum.filter(&(&1["is_buy_order"]))
+		orders 
+			|> Enum.map(&(&1["type_id"]))
+			|> Enum.map(fn type ->
+					my_type_orders = orders |> Enum.filter(&(&1["type_id"] == type))
+					my_type_orders_count = my_type_orders |> Enum.count()
+					type_on_top? = type_orders(10000002, type, "buy")
+						|> Enum.sort(&(&1["price"] > &2["price"]))
+						|> Enum.take(my_type_orders_count)
+						|> Enum.all?(fn order ->
+							Enum.find_value(my_type_orders, &(&1["order_id"] == order["order_id"]))
+						end)
+					if !type_on_top?, do: type, else: nil
+				end)
+			|> Enum.filter(&(&1) != nil)
+			|> types_info()
+			|> Enum.map(&(&1["name"]))
+	end
+
 	def type_orders(region_id, type_id, order_type \\ "all", page \\ 1) do
 		HTTPoison.get!(Urls.type_orders(region_id, type_id, order_type, page)).body |> Jason.decode!
 	end
