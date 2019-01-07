@@ -4,7 +4,7 @@ defmodule EvemarketScanner.EveClient do
 	def get!(character, url) do
 		character = check_access_token(character) # check access_token and update if need
 		headers = [{"Authorization", "Bearer " <> character.access_token}]
-		HTTPoison.get!(url, headers).body |> Jason.decode!
+		HTTPoison.get!(url, headers).body |> Jason.decode!(keys: :atoms)
 	end
 
 	def get!(url) do
@@ -13,7 +13,8 @@ defmodule EvemarketScanner.EveClient do
 	end
 	def get(url) do
 		case HTTPoison.get(url) do
-			{:ok, %HTTPoison.Response{status_code: 200, body: body}} -> {:ok, Jason.decode! body}
+			{:ok, %HTTPoison.Response{status_code: 200, body: body}} -> 
+				{:ok, Jason.decode!(body, keys: :atoms)}
 			{:ok ,%HTTPoison.Response{} = response} -> {:eve_error, response}
 			default -> default
 		end
