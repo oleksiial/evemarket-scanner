@@ -11,4 +11,6 @@ defmodule EvemarketScanner.Urls do
 	def group_info(group_id), do: "https://esi.evetech.net/latest/universe/groups/#{group_id}?language=en-us"
 	def category_info(category_id), do: "https://esi.evetech.net/latest/universe/categories/#{category_id}?language=en-us"
 	def category_ids(), do: "https://esi.evetech.net/latest/universe/categories"
+
+	def route(origin, destination), do: "https://esi.evetech.net/latest/route/#{origin}/#{destination}?flag=shortest"
 end

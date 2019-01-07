@@ -28,11 +28,15 @@ defmodule EvemarketScanner do
 			|> Enum.map(fn type ->
 					my_type_orders = orders |> Enum.filter(&(&1["type_id"] == type))
 					my_type_orders_count = my_type_orders |> Enum.count()
-					type_on_top? = type_orders(10000002, type, "sell")
+					type_orders = type_orders(10000002, type, "sell")
+					type_on_top? = type_orders
+						|> Enum.filter(&(&1["location_id"] === Enum.at(my_type_orders, 0)["location_id"])) #!!!
 						|> Enum.sort(&(&1["price"] < &2["price"]))
 						|> Enum.take(my_type_orders_count)
 						|> Enum.all?(fn order ->
-							Enum.find_value(my_type_orders, &(&1["order_id"] == order["order_id"]))
+							Enum.find_value(my_type_orders, &(
+								&1["order_id"] == order["order_id"]
+							))
 						end)
 					if !type_on_top?, do: type, else: nil
 				end)
@@ -69,7 +73,7 @@ defmodule EvemarketScanner do
 		sell_orders = type_orders(region_id, type_id, "sell") |> Enum.take(-1)
 		buy_orders = type_orders(region_id, type_id, "buy") |> Enum.take(-1)
 		if sell_orders == [] or buy_orders == [] do
-			-100
+			-100.0
 		else
 			last_sell_order = hd sell_orders
 			last_buy_order = hd buy_orders
@@ -100,5 +104,12 @@ defmodule EvemarketScanner do
 	def categories_info(category_ids) do
 		Enum.reduce(category_ids, [], fn x, acc -> acc ++ [(HTTPoison.get!(Urls.category_info(x)).body |> Jason.decode!)] end)
 		|> Enum.filter(fn x -> x["published"] == true end)
+	end
+
+	def route_length(origin, destination) do
+		HTTPoison.get!(Urls.route(origin, destination)).body
+			|> Jason.decode!
+			|> Enum.count
+			|> Kernel.-(1)
 	end
 end
