@@ -14,7 +14,7 @@ defmodule EvemarketScanner.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger, :timex],
       mod: {EvemarketScanner.Application, []}
     ]
   end
@@ -26,7 +26,8 @@ defmodule EvemarketScanner.MixProject do
       {:jason, "~> 1.1"},
       {:postgrex, "~> 0.14.1"},
       {:ecto_sql, "~> 3.0"},
-      {:joken, "~> 2.0"}
+      {:joken, "~> 2.0"},
+      {:timex, "~> 3.1"}
     ]
   end
 end
