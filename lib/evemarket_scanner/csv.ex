@@ -8,6 +8,13 @@ defmodule EvemarketScanner.Csv do
 		File.write!("margin.csv", margins)
 	end
 
+	def fetch_margins(types) do
+		margins = types
+			|> Enum.map(&fetch_margin(&1))
+			|> Enum.map(fn {k, v} -> k <> "," <> Float.to_string(v) <> "\n" end)
+		File.write!("margin.csv", margins)
+	end
+
 	def fetch_margin(type, region_id \\ 10000002 ) do
 		margin = EvemarketScanner.type_orders_margin(region_id, type.type_id)
 		{ type.name, margin }

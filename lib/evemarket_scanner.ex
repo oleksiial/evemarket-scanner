@@ -136,4 +136,8 @@ defmodule EvemarketScanner do
 			|> Enum.count
 			|> Kernel.-(1)
 	end
+
+	def market_types(region_id \\ 10000002) do
+		EveClient.get!(Urls.market_types(region_id, 1))
+	end
 end
