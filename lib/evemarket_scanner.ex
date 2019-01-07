@@ -66,7 +66,7 @@ defmodule EvemarketScanner do
 	end
 
 	def type_orders(region_id, type_id, order_type \\ "all", page \\ 1) do
-		HTTPoison.get!(Urls.type_orders(region_id, type_id, order_type, page)).body |> Jason.decode!
+		EveClient.get!(Urls.type_orders(region_id, type_id, order_type, page))
 	end
 
 	def type_orders_margin(region_id, type_id) do
@@ -87,8 +87,9 @@ defmodule EvemarketScanner do
 	def type_info(id) when is_number(id), do: type_info(Repo.get(Type, id), id)	
 	defp type_info(nil, nil), do: :not_found
 	defp type_info(nil, id) do
-		(id |> Urls.type_info() |> HTTPoison.get!()).body
-			|> Jason.decode!
+		id 
+			|> Urls.type_info()
+			|> EveClient.get!()
 			|> Repo.create_type 
 	end
 	defp type_info(type, _id), do: type
@@ -96,19 +97,18 @@ defmodule EvemarketScanner do
 	def types_info(type_ids), do: type_ids |> Enum.map(&type_info(&1))
 
 	def groups_info(group_ids) do
-		Enum.reduce(group_ids, [], fn x, acc -> acc ++ [(HTTPoison.get!(Urls.group_info(x)).body |> Jason.decode!)] end)
+		Enum.reduce(group_ids, [], fn x, acc -> acc ++ [(EveClient.get!(Urls.group_info(x)))] end)
 		|> Enum.filter(fn x -> x["published"] == true end)
 	end
 	
-	def categories_info, do: categories_info(HTTPoison.get!(Urls.category_ids).body |> Jason.decode!)
+	def categories_info, do: categories_info(EveClient.get!(Urls.category_ids))
 	def categories_info(category_ids) do
-		Enum.reduce(category_ids, [], fn x, acc -> acc ++ [(HTTPoison.get!(Urls.category_info(x)).body |> Jason.decode!)] end)
+		Enum.reduce(category_ids, [], fn x, acc -> acc ++ [(EveClient.get!(Urls.category_info(x)))] end)
 		|> Enum.filter(fn x -> x["published"] == true end)
 	end
 
 	def route_length(origin, destination) do
-		HTTPoison.get!(Urls.route(origin, destination)).body
-			|> Jason.decode!
+		EveClient.get!(Urls.route(origin, destination))
 			|> Enum.count
 			|> Kernel.-(1)
 	end

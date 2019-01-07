@@ -7,6 +7,18 @@ defmodule EvemarketScanner.EveClient do
 		HTTPoison.get!(url, headers).body |> Jason.decode!
 	end
 
+	def get!(url) do
+		{:ok, response_body} = get(url)
+		response_body
+	end
+	def get(url) do
+		case HTTPoison.get(url) do
+			{:ok, %HTTPoison.Response{status_code: 200, body: body}} -> {:ok, Jason.decode! body}
+			{:ok ,%HTTPoison.Response{} = response} -> {:eve_error, response}
+			default -> default
+		end
+	end
+
 	defp check_access_token(character) do
 		if character.expires_at <= (DateTime.utc_now |> DateTime.to_unix) do
 			refresh_token(character)
