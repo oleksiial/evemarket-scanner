@@ -5,11 +5,12 @@ defmodule EvemarketScanner.Type do
   schema "types" do
     field :name, :string
 		field :market_group_id, :integer
-		field :group_id, :integer
+    
+    belongs_to :group, EvemarketScanner.Group, references: :group_id
   end
 
-  def changeset(character, params \\ %{}) do
-    character
+  def changeset(type, params \\ %{}) do
+    type
     |> Ecto.Changeset.cast(params, [:type_id, :name, :market_group_id, :group_id])
     |> Ecto.Changeset.validate_required([:type_id, :name, :group_id])
   end

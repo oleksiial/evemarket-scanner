@@ -4,8 +4,12 @@ defmodule EvemarketScanner.Repo do
     adapter: Ecto.Adapters.Postgres
 
   def create_type(%{} = attrs) do
-    attrs = attrs |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-    changeset = struct EvemarketScanner.Type, attrs
+    changeset = EvemarketScanner.Type.changeset(%EvemarketScanner.Type{}, attrs)
+    EvemarketScanner.Repo.insert! changeset
+  end
+
+  def create_group(%{} = attrs) do
+    changeset = EvemarketScanner.Group.changeset(%EvemarketScanner.Group{}, attrs)
     EvemarketScanner.Repo.insert! changeset
   end
 end
