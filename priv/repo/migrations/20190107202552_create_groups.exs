@@ -6,6 +6,6 @@ defmodule EvemarketScanner.Repo.Migrations.CreateGroups do
       add :group_id, :integer, primary_key: true
       add :name, :string, null: false
       add :category_id, :integer, null: false
-    end   
+    end
   end
 end
