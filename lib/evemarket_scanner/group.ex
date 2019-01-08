@@ -4,8 +4,8 @@ defmodule EvemarketScanner.Group do
   @primary_key {:group_id, :integer, autogenerate: false}
   schema "groups" do
     field :name, :string
-    field :category_id, :integer
     
+    belongs_to :category, EvemarketScanner.Group, references: :category_id
     has_many :types, EvemarketScanner.Type, foreign_key: :group_id
   end
 
