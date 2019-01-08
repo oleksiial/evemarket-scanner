@@ -1,6 +1,10 @@
 defmodule EvemarketScanner.Csv do
 	alias EvemarketScanner.{Repo, Type}
 
+	def	write_csv!(path, data) do
+		File.write!(path, Enum.join(data, ",") <> "\n", [:append])
+	end
+
 	def fetch_all_margins() do
 		margins = Repo.all(Type)
 			|> Enum.map(&fetch_margin(&1))

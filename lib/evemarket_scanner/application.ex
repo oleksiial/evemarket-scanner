@@ -9,6 +9,7 @@ defmodule EvemarketScanner.Application do
     # List all child processes to be supervised
     children = [
       EvemarketScanner.Repo,
+      EvemarketScanner.Scheduler
       # Starts a worker by calling: EvemarketScanner.Worker.start_link(arg)
       # {EvemarketScanner.Worker, arg},
     ]

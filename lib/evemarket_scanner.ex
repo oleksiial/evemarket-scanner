@@ -18,7 +18,8 @@ defmodule EvemarketScanner do
 		n_sell = t_sell |> Enum.count
 		total_buy = t_buy |> Enum.reduce(0, &(&1.quantity * &1.unit_price + &2))
 		total_sell = t_sell |> Enum.reduce(0, &(&1.quantity * &1.unit_price + &2))
-		%{buy: %{n: n_buy, total: total_buy}, sell: %{n: n_sell, total: total_sell}}
+		diff = total_sell - total_buy
+		%{buy: %{n: n_buy, total: total_buy}, sell: %{n: n_sell, total: total_sell}, diff: diff}
 	end
 
 	def transactions_by_type(type_id, character_name \\ "Alex Prog", start_date \\ "0001-01-01", end_date \\ "9999-12-31") do
